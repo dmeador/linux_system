@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Utility which allows a user to obtain the xauth token
+# of a specified user (usually the user with a valid X-display)
+# and adds the xauth token to the current user which allows
+# x-programs to function.
+
+function usage ()
+{
+	PROGRAM_NAME=$(basename $0)
+	echo ""
+	echo usage: $PROGRAM_NAME  username
+	echo ""
+	exit 1
+}
+
+# invoke  usage
+# call usage() function if filename not supplied
+[[ $# -eq 0 ]] && usage
+
+
+X11USER=$1
+#echo getting xauth for $X11USER
+#echo `sudo su - $X11USER -c 'xauth list'`
+X11AUTH=$(sudo su - $X11USER -c 'xauth list' |\
+         grep `echo $DISPLAY |\
+             cut -d ':' -f 2 |\
+             cut -d '.' -f 1 |\
+             sed -e s/^/:/`  |\
+                cat)
+#echo $USER
+#echo xauth add $X11AUTH
+xauth add $X11AUTH
